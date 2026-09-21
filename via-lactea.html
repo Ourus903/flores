@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="Una galaxia dorada generativa donde florecen ramos de luz. Toca una flor para abrirla." />
+  <meta name="theme-color" content="#04040c" />
+  <title>Vía Láctea Amarilla</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,600&family=Karla:wght@400;600&display=swap"
+    rel="stylesheet"
+  />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            gold: '#ffd23f',
+            amber: '#ffb02e',
+            ember: '#ff6f1f',
+            void: '#04040c',
+          },
+          fontFamily: {
+            display: ['Fraunces', 'Georgia', 'serif'],
+            sans: ['Karla', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+/* =========================================================
+   Vía Láctea Amarilla — estilos propios
+   Tailwind resuelve la maquetación del panel; aquí va todo lo
+   que Tailwind no cubre: animaciones, flores y capas.
+   ========================================================= */
+
+:root {
+  --gold: #ffd23f;
+  --amber: #ffb02e;
+  --ember: #ff6f1f;
+  --void: #04040c;
+  --bloom: 1;
+
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+  background: var(--void);
+  color: #f7ecd4;
+  font-family: 'Karla', ui-sans-serif, system-ui, sans-serif;
+  opacity: 0;
+  transition: opacity 900ms ease;
+}
+
+body.is-ready {
+  opacity: 1;
+}
+
+/* Contenedores -------------------------------------------------- */
+
+#sky {
+  position: fixed;
+  inset: 0;
+  display: block;
+}
+
+#scene {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.sr-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Flores -------------------------------------------------------- */
+
+.flower {
+  position: absolute;
+  width: var(--size, 56px);
+  height: var(--size, 56px);
+  margin: calc(var(--size, 56px) / -2);
+  cursor: pointer;
+  filter: drop-shadow(0 0 6px rgba(255, 196, 64, calc(0.55 * var(--bloom))))
+    drop-shadow(0 0 18px rgba(255, 140, 32, calc(0.3 * var(--bloom))))
+    hue-rotate(var(--hue-shift, 0deg));
+  transition: filter 260ms ease, scale 260ms cubic-bezier(0.2, 0.9, 0.3, 1.4);
+  animation: float var(--float-duration, 9s) ease-in-out var(--float-delay, 0s) infinite;
+  transform-origin: 50% 50%;
+  rotate: var(--spin, 0deg);
+  touch-action: manipulation;
+}
+
+.flower:hover,
+.flower:focus-visible {
+  scale: 1.14;
+  filter: drop-shadow(0 0 12px rgba(255, 220, 120, 0.85))
+    drop-shadow(0 0 32px rgba(255, 150, 40, 0.5)) hue-rotate(var(--hue-shift, 0deg));
+}
+
+.flower:focus-visible {
+  outline: 2px solid rgba(255, 240, 190, 0.9);
+  outline-offset: 4px;
+  border-radius: 50%;
+}
+
+/* El giro lento solo vive en la corona de pétalos, no en toda la flor,
+   y solo en las especies radiales: un tulipán girando se vería falso. */
+.flower .petals {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+}
+
+.flower--daisy .petals,
+.flower--sunflower .petals,
+.flower--rose .petals {
+  animation: rotate-petals calc(var(--float-duration, 9s) * 8) linear infinite;
+}
+
+.flower--rose .petals {
+  animation-direction: reverse;
+}
+
+/* Tulipán y lirio respiran en vez de girar. */
+.flower--tulip .petals,
+.flower--lily .petals {
+  animation: breathe calc(var(--float-duration, 9s) * 1.4) ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    scale: 1;
+  }
+  50% {
+    scale: 1.05 0.97;
+  }
+}
+
+.flower.is-blooming {
+  animation: float var(--float-duration, 9s) ease-in-out var(--float-delay, 0s) infinite,
+    bloom 640ms cubic-bezier(0.2, 0.9, 0.3, 1.3);
+}
+
+.bouquet {
+  position: absolute;
+  animation: sway var(--sway-duration, 12s) ease-in-out var(--sway-delay, 0s) infinite;
+  transform-origin: 50% 90%;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  33% {
+    translate: 2px -12px;
+  }
+  66% {
+    translate: -3px -5px;
+  }
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    rotate: -2.2deg;
+  }
+  50% {
+    rotate: 2.2deg;
+  }
+}
+
+@keyframes rotate-petals {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes bloom {
+  0% {
+    scale: 1;
+  }
+  38% {
+    scale: 1.45;
+  }
+  100% {
+    scale: 1;
+  }
+}
+
+/* Partículas y luz ---------------------------------------------- */
+
+.petal-spark {
+  position: fixed;
+  width: 7px;
+  height: 11px;
+  border-radius: 60% 60% 45% 45%;
+  pointer-events: none;
+  z-index: 60;
+  box-shadow: 0 0 10px rgba(255, 200, 80, 0.8);
+}
+
+#glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 320px;
+  height: 320px;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 20;
+  transition: opacity 400ms ease;
+  background: radial-gradient(
+    circle,
+    rgba(255, 210, 90, calc(0.13 * var(--bloom))),
+    rgba(255, 140, 40, 0.05) 45%,
+    transparent 70%
+  );
+}
+
+/* Interfaz ------------------------------------------------------- */
+
+.panel-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-optical-sizing: auto;
+  font-variation-settings: 'SOFT' 40, 'WONK' 1;
+  letter-spacing: -0.015em;
+}
+
+#panel {
+  transition: transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 320ms ease;
+}
+
+#panel.is-hidden {
+  transform: translateX(calc(100% + 2rem));
+  opacity: 0;
+  pointer-events: none;
+}
+
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--ember), var(--gold));
+  cursor: pointer;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #fff6dd;
+  border: 2px solid var(--amber);
+  box-shadow: 0 0 10px rgba(255, 190, 60, 0.7);
+}
+
+input[type='range']::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border: 2px solid var(--amber);
+  border-radius: 50%;
+  background: #fff6dd;
+}
+
+input[type='checkbox'] {
+  accent-color: var(--amber);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+:where(button, input, a):focus-visible {
+  outline: 2px solid rgba(255, 230, 160, 0.9);
+  outline-offset: 2px;
+}
+
+/* Movimiento reducido -------------------------------------------- */
+
+.no-motion .flower,
+.no-motion .bouquet,
+.no-motion .flower .petals {
+  animation: none !important;
+}
+
+.no-motion .layer {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    transition: none;
+  }
+}
+
+@media (max-width: 720px) {
+  #glow {
+    display: none;
+  }
+}
+
+</style>
+</head>
+
+<body class="font-sans">
+  <!-- Cielo: estrellas, nebulosas, polvo y cometas -->
+  <canvas id="sky" aria-hidden="true"></canvas>
+
+  <!-- Jardín: capas de flores con parallax -->
+  <main id="scene" aria-label="Jardín de flores doradas flotando en la galaxia"></main>
+
+  <div id="glow" aria-hidden="true"></div>
+
+  <!-- Mensaje efímero -->
+  <p
+    id="status"
+    role="status"
+    class="pointer-events-none fixed bottom-6 left-1/2 z-40 -translate-x-1/2 rounded-full border border-amber/30 bg-black/50 px-4 py-2 text-sm text-gold opacity-0 backdrop-blur transition-opacity duration-500"
+  ></p>
+
+  <!-- Panel de control -->
+  <button
+    id="panel-toggle"
+    type="button"
+    aria-expanded="true"
+    aria-controls="panel"
+    class="fixed right-4 top-4 z-50 rounded-full border border-amber/40 bg-black/45 px-4 py-2 text-sm text-gold backdrop-blur transition hover:border-gold hover:bg-black/70"
+  >
+    Panel
+  </button>
+
+  <aside
+    id="panel"
+    class="fixed right-4 top-16 z-40 w-[17.5rem] max-w-[calc(100vw-2rem)] rounded-2xl border border-amber/25 bg-black/45 p-5 backdrop-blur-md"
+  >
+    <h1 class="panel-title text-2xl font-light leading-tight text-gold">Vía Láctea Amarilla</h1>
+    <p class="mt-1 text-sm leading-snug text-amber/70">
+      Toca una flor para abrirla. Mueve el cursor para inclinar el cielo.
+    </p>
+
+    <div class="mt-5 space-y-4">
+      <label class="block">
+        <span class="mb-2 flex items-center justify-between text-sm text-gold/85">
+          Densidad de estrellas
+        </span>
+        <input
+          id="control-density"
+          type="range"
+          min="0.4"
+          max="1.6"
+          step="0.05"
+          value="1"
+          class="w-full"
+        />
+      </label>
+
+      <label class="block">
+        <span class="mb-2 flex items-center justify-between text-sm text-gold/85">
+          Intensidad del brillo
+        </span>
+        <input
+          id="control-bloom"
+          type="range"
+          min="0.4"
+          max="1.6"
+          step="0.05"
+          value="1"
+          class="w-full"
+        />
+      </label>
+
+      <div class="flex items-center justify-between gap-4 pt-1">
+        <label class="flex items-center gap-2 text-sm text-gold/85">
+          <input id="control-motion" type="checkbox" checked />
+          Movimiento
+        </label>
+        <label class="flex items-center gap-2 text-sm text-gold/85">
+          <input id="control-audio" type="checkbox" />
+          Sonido
+        </label>
+      </div>
+    </div>
+
+    <div class="mt-5 grid grid-cols-2 gap-2">
+      <button
+        id="action-reseed"
+        type="button"
+        class="col-span-2 rounded-xl border border-amber/40 bg-amber/10 px-3 py-2 text-sm text-gold transition hover:bg-amber/20"
+      >
+        Crear otra galaxia
+      </button>
+      <button
+        id="action-comet"
+        type="button"
+        class="rounded-xl border border-amber/25 px-3 py-2 text-sm text-gold/85 transition hover:border-gold hover:text-gold"
+      >
+        Lanzar cometa
+      </button>
+      <button
+        id="action-share"
+        type="button"
+        class="rounded-xl border border-amber/25 px-3 py-2 text-sm text-gold/85 transition hover:border-gold hover:text-gold"
+      >
+        Copiar enlace
+      </button>
+    </div>
+
+    <dl class="mt-5 space-y-1 border-t border-amber/15 pt-4 text-xs text-amber/60">
+      <div class="flex justify-between">
+        <dt>Semilla</dt>
+        <dd id="seed-label" class="text-gold/80">—</dd>
+      </div>
+      <div class="flex justify-between">
+        <dt>Estrellas en escena</dt>
+        <dd id="star-count" class="text-gold/80">0</dd>
+      </div>
+      <div class="flex justify-between">
+        <dt>Atajos</dt>
+        <dd class="text-gold/80">N, C, M, H, espacio</dd>
+      </div>
+    </dl>
+  </aside>
+
+  <script type="module">
+/* ===== config.js ===== */
+/**
+ * Parámetros de la escena en un solo lugar.
+ * Cambiar algo aquí no debería obligar a tocar ningún otro archivo.
+ */
+
+/** Tres temperaturas de estrella: oro, ámbar y brasa. */
+const STAR_TIERS = [
+  { core: '#fffbe0', mid: '#ffd54a', edge: '#ff9d1c', weight: 0.42 },
+  { core: '#fffde7', mid: '#ffe95c', edge: '#ffc107', weight: 0.33 },
+  { core: '#ffe9b0', mid: '#ff9f2e', edge: '#ff5e2b', weight: 0.25 },
+];
+
+const NEBULA_COLORS = [
+  'rgba(255, 196, 64, 0.20)',
+  'rgba(255, 233, 120, 0.14)',
+  'rgba(255, 137, 42, 0.12)',
+  'rgba(180, 130, 255, 0.07)', // un violeta muy tenue da profundidad al oro
+];
+
+/** Conteos base; el slider de densidad los multiplica. */
+const COUNTS = {
+  armStars: 1500,
+  fieldStars: 700,
+  dust: 180,
+  nebulae: 9,
+  bouquets: 5,
+  scattered: 11,
+};
+
+const GALAXY = {
+  arms: 3,
+  spin: 3.1, // vueltas que da cada brazo
+  flatten: 0.46, // achatamiento vertical del disco
+  scatter: 0.055, // dispersión perpendicular al brazo
+  coreBulge: 0.22, // fracción de estrellas concentradas en el núcleo
+  rotation: 0.012, // rad/s en el borde (el centro gira más rápido)
+};
+
+const SPECIES = ['daisy', 'sunflower', 'tulip', 'rose', 'lily'];
+
+const NAMES = {
+  daisy: 'Margarita',
+  sunflower: 'Girasol',
+  tulip: 'Tulipán',
+  rose: 'Rosa',
+  lily: 'Lirio',
+};
+
+/** Escala pentatónica mayor (Do), en Hz, para el sonido al tocar una flor. */
+const SCALE_HZ = [523.25, 587.33, 659.25, 783.99, 880.0, 1046.5, 1174.66];
+
+const DEFAULTS = {
+  density: 1,
+  bloom: 1,
+  motion: true,
+  audio: false,
+};
+
+/* ===== utils.js ===== */
+/**
+ * Utilidades compartidas.
+ * Todo el azar de la escena pasa por un PRNG con semilla, para que una misma
+ * semilla produzca siempre la misma galaxia (y se pueda compartir por URL).
+ */
+
+/** Generador pseudoaleatorio determinista (mulberry32). */
+function makeRng(seed) {
+  let a = seed >>> 0;
+  const next = () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+
+  return {
+    /** Flotante en [min, max). */
+    range: (min, max) => min + next() * (max - min),
+    /** Entero en [min, max]. */
+    int: (min, max) => Math.floor(min + next() * (max - min + 1)),
+    /** Elemento al azar de un arreglo. */
+    pick: (list) => list[Math.floor(next() * list.length)],
+    /** true con probabilidad p. */
+    chance: (p) => next() < p,
+    /** Ruido con tendencia al centro (suma de 3 muestras). */
+    bell: (min, max) => {
+      const t = (next() + next() + next()) / 3;
+      return min + t * (max - min);
+    },
+    raw: next,
+  };
+}
+
+/** Convierte texto a semilla numérica (hash FNV-1a). */
+function seedFromString(text) {
+  let h = 2166136261;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+/** Semilla legible de 6 caracteres, tipo "k3f9qa". */
+function randomSeedLabel() {
+  return Math.random().toString(36).slice(2, 8);
+}
+
+const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const TAU = Math.PI * 2;
+
+/** ¿El sistema pide reducir animaciones? */
+function prefersReducedMotion() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+/** Lee la configuración inicial del hash de la URL: #seed=abc&density=1.2 */
+function readUrlState() {
+  const params = new URLSearchParams(location.hash.slice(1));
+  return {
+    seed: params.get('seed') || null,
+    density: params.has('density') ? Number(params.get('density')) : null,
+  };
+}
+
+/** Escribe el estado en la URL sin recargar ni ensuciar el historial. */
+function writeUrlState({ seed, density }) {
+  const params = new URLSearchParams();
+  params.set('seed', seed);
+  params.set('density', density.toFixed(2));
+  history.replaceState(null, '', `#${params}`);
+}
+
+/* ===== flowers.js ===== */
+/**
+ * Flores en SVG.
+ *
+ * El original apilaba entre 12 y 45 <div> por flor (cada pétalo un div con
+ * gradiente y box-shadow). Aquí cada flor es un solo <svg> con geometría
+ * vectorial: se ve nítida en cualquier escala, pesa menos y el glow se resuelve
+ * con un único drop-shadow en CSS en vez de dos sombras por pétalo.
+ *
+ * Los degradados viven en un <defs> global compartido por todas las flores.
+ */
+
+
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+const GRADIENTS = [
+  { id: 'gp-daisy', type: 'linear', stops: ['#fffde3', '#ffd83d', '#ffab2e'] },
+  { id: 'gc-daisy', type: 'radial', stops: ['#ffcb45', '#ff8f1f', '#ef5b18'] },
+  { id: 'gp-sunflower', type: 'linear', stops: ['#ffe680', '#ffc21f', '#ef7d15'] },
+  { id: 'gc-sunflower', type: 'radial', stops: ['#7a5a3a', '#4a3020', '#2a1a12'] },
+  { id: 'gp-tulip', type: 'linear', stops: ['#fff6a8', '#ffd93b', '#f5a623'] },
+  { id: 'gc-tulip', type: 'radial', stops: ['#ffb42e', '#f2701c', '#d94a14'] },
+  { id: 'gp-rose', type: 'radial', stops: ['#fff8cf', '#ffd034', '#f08a1c'] },
+  { id: 'gc-rose', type: 'radial', stops: ['#ffe071', '#ffa626', '#e8721a'] },
+  { id: 'gp-lily', type: 'linear', stops: ['#fffbd0', '#ffe94f', '#f8c01e'] },
+  { id: 'gc-lily', type: 'radial', stops: ['#ffb02e', '#f4701d', '#c9440f'] },
+];
+
+/** Inyecta una sola vez los degradados reutilizados por todas las flores. */
+function installFlowerDefs(host = document.body) {
+  if (document.getElementById('flower-defs')) return;
+
+  const svg = el('svg', { id: 'flower-defs', 'aria-hidden': 'true', focusable: 'false' });
+  svg.classList.add('sr-defs');
+  const defs = el('defs');
+
+  for (const g of GRADIENTS) {
+    const node =
+      g.type === 'linear'
+        ? el('linearGradient', { id: g.id, x1: '0', y1: '0', x2: '0', y2: '1' })
+        : el('radialGradient', { id: g.id, cx: '0.4', cy: '0.35', r: '0.75' });
+
+    g.stops.forEach((color, i) => {
+      node.appendChild(
+        el('stop', { offset: i / (g.stops.length - 1), 'stop-color': color }),
+      );
+    });
+    defs.appendChild(node);
+  }
+
+  svg.appendChild(defs);
+  host.appendChild(svg);
+}
+
+/**
+ * Crea una flor.
+ * @param {string} species  daisy | sunflower | tulip | rose | lily
+ * @param {object} options  { seed, size, hueShift }
+ */
+function createFlower(species, { seed = 1, size = 56, hueShift = 0 } = {}) {
+  const rng = makeRng(seed);
+  const svg = el('svg', {
+    viewBox: '0 0 100 100',
+    role: 'button',
+    tabindex: '0',
+    'aria-label': `${NAMES[species] ?? 'Flor'} dorada`,
+  });
+  svg.classList.add('flower', `flower--${species}`);
+  svg.style.setProperty('--size', `${size}px`);
+  svg.style.setProperty('--hue-shift', `${hueShift}deg`);
+  svg.style.setProperty('--float-duration', `${rng.range(6, 12).toFixed(2)}s`);
+  svg.style.setProperty('--float-delay', `${rng.range(-6, 0).toFixed(2)}s`);
+  svg.style.setProperty('--spin', `${rng.range(-6, 6).toFixed(1)}deg`);
+  svg.dataset.species = species;
+
+  BUILDERS[species](svg, rng);
+  return svg;
+}
+
+const BUILDERS = { daisy, sunflower, tulip, rose, lily };
+
+function daisy(svg, rng) {
+  const petals = 13;
+  const group = el('g', { class: 'petals' });
+
+  for (let i = 0; i < petals; i++) {
+    const angle = (i / petals) * 360;
+    group.appendChild(
+      el('ellipse', {
+        cx: 50,
+        cy: 26 + rng.range(-1.5, 1.5),
+        rx: 7.5,
+        ry: 19,
+        fill: 'url(#gp-daisy)',
+        transform: `rotate(${angle + rng.range(-3, 3)} 50 50)`,
+      }),
+    );
+  }
+
+  svg.append(group, el('circle', { cx: 50, cy: 50, r: 11, fill: 'url(#gc-daisy)' }));
+  svg.appendChild(el('circle', { cx: 46, cy: 46, r: 3.4, fill: 'rgba(255,250,214,.65)' }));
+}
+
+function sunflower(svg, rng) {
+  const group = el('g', { class: 'petals' });
+
+  // Dos coronas de pétalos desfasadas dan volumen sin duplicar el conteo.
+  [
+    { count: 22, cy: 18, rx: 5.2, ry: 20, offset: 0 },
+    { count: 18, cy: 27, rx: 4.6, ry: 15, offset: 9 },
+  ].forEach((ring) => {
+    for (let i = 0; i < ring.count; i++) {
+      const angle = (i / ring.count) * 360 + ring.offset;
+      group.appendChild(
+        el('ellipse', {
+          cx: 50,
+          cy: ring.cy,
+          rx: ring.rx,
+          ry: ring.ry,
+          fill: 'url(#gp-sunflower)',
+          opacity: ring.offset ? 0.92 : 1,
+          transform: `rotate(${angle + rng.range(-2, 2)} 50 50)`,
+        }),
+      );
+    }
+  });
+
+  svg.append(group, el('circle', { cx: 50, cy: 50, r: 17, fill: 'url(#gc-sunflower)' }));
+
+  // Semillas en espiral de Fermat (el patrón real de un capítulo floral).
+  const seeds = el('g', { opacity: 0.55 });
+  const golden = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < 90; i++) {
+    const r = 16 * Math.sqrt(i / 90);
+    const a = i * golden;
+    seeds.appendChild(
+      el('circle', {
+        cx: 50 + Math.cos(a) * r,
+        cy: 50 + Math.sin(a) * r,
+        r: 0.85,
+        fill: '#1f1208',
+      }),
+    );
+  }
+  svg.appendChild(seeds);
+}
+
+function tulip(svg, rng) {
+  const group = el('g', { class: 'petals' });
+  const cup = 'M50 92 C 32 74, 28 38, 50 14 C 72 38, 68 74, 50 92 Z';
+
+  // Pétalos abiertos en abanico desde la base de la copa.
+  [-34, -17, 0, 17, 34].forEach((angle, i) => {
+    group.appendChild(
+      el('path', {
+        d: cup,
+        fill: 'url(#gp-tulip)',
+        opacity: i === 2 ? 1 : 0.88,
+        transform: `rotate(${angle + rng.range(-2, 2)} 50 86)`,
+      }),
+    );
+  });
+
+  svg.append(group, el('ellipse', { cx: 50, cy: 52, rx: 6, ry: 12, fill: 'url(#gc-tulip)' }));
+}
+
+function rose(svg, rng) {
+  const group = el('g', { class: 'petals' });
+
+  // Capas concéntricas rotadas: imita la espiral de una rosa abierta.
+  for (let layer = 3; layer >= 0; layer--) {
+    const count = 5 + layer * 2;
+    const radius = 7 + layer * 8.5;
+    const petal = 10 + layer * 3.5;
+
+    for (let i = 0; i < count; i++) {
+      const a = (i / count) * TAU + layer * 0.4;
+      group.appendChild(
+        el('ellipse', {
+          cx: 50 + Math.cos(a) * radius,
+          cy: 50 + Math.sin(a) * radius,
+          rx: petal,
+          ry: petal * 0.86,
+          fill: 'url(#gp-rose)',
+          opacity: 0.72 + layer * 0.07,
+          transform: `rotate(${(a * 180) / Math.PI + rng.range(-8, 8)} 50 50)`,
+        }),
+      );
+    }
+  }
+
+  svg.append(group, el('circle', { cx: 50, cy: 50, r: 7, fill: 'url(#gc-rose)' }));
+}
+
+function lily(svg, rng) {
+  const group = el('g', { class: 'petals' });
+  const blade = 'M50 88 C 38 64, 34 30, 50 8 C 66 30, 62 64, 50 88 Z';
+
+  for (let i = 0; i < 6; i++) {
+    group.appendChild(
+      el('path', {
+        d: blade,
+        fill: 'url(#gp-lily)',
+        opacity: i % 2 ? 0.88 : 1,
+        transform: `rotate(${i * 60 + rng.range(-3, 3)} 50 50)`,
+      }),
+    );
+  }
+  svg.appendChild(group);
+
+  // Estambres: la firma visual del lirio.
+  const stamens = el('g');
+  for (let i = 0; i < 5; i++) {
+    const a = -Math.PI / 2 + (i - 2) * 0.28;
+    const x = 50 + Math.cos(a) * 20;
+    const y = 50 + Math.sin(a) * 20;
+    stamens.appendChild(
+      el('path', {
+        d: `M50 50 Q ${50 + (x - 50) * 0.5} ${y + 6} ${x} ${y}`,
+        stroke: 'rgba(255, 236, 160, .75)',
+        'stroke-width': 1.4,
+        fill: 'none',
+      }),
+    );
+    stamens.appendChild(el('circle', { cx: x, cy: y, r: 2.4, fill: 'url(#gc-lily)' }));
+  }
+
+  svg.append(stamens, el('circle', { cx: 50, cy: 50, r: 4.5, fill: 'url(#gc-lily)' }));
+}
+
+/** Crea un elemento SVG con atributos. */
+function el(name, attrs = {}) {
+  const node = document.createElementNS(SVG_NS, name);
+  for (const [key, value] of Object.entries(attrs)) {
+    node.setAttribute(key, value);
+  }
+  return node;
+}
+
+/* ===== starfield.js ===== */
+/**
+ * Cielo en canvas.
+ *
+ * El original creaba ~900 <div> animados por CSS: cada fotograma el navegador
+ * recalcula estilo y capa de compositing para cada uno. Aquí todo el cielo vive
+ * en un solo canvas: 2200 estrellas cuestan menos que 300 divs.
+ *
+ * Trucos de rendimiento:
+ *  - Sprites pregenerados (un gradiente radial por temperatura de estrella) que
+ *    se dibujan con drawImage en vez de recalcular gradientes 2200 veces.
+ *  - Nebulosas rasterizadas una sola vez en un canvas de baja resolución.
+ *  - Composición "lighter" para que el brillo se sume como luz real.
+ */
+
+
+
+const SPRITE_SIZE = 64;
+
+class Starfield {
+  constructor(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d', { alpha: false });
+    this.dpr = 1;
+    this.width = 0;
+    this.height = 0;
+
+    this.stars = [];
+    this.dust = [];
+    this.nebulae = [];
+    this.comets = [];
+
+    this.pointer = { x: 0, y: 0 };
+    this.bloom = 1;
+    this.motion = true;
+
+    this.sprites = STAR_TIERS.map((tier) => buildStarSprite(tier));
+    this.nebulaLayer = document.createElement('canvas');
+  }
+
+  /** Reconstruye la galaxia completa con una semilla y densidad dadas. */
+  generate(seed, density = 1) {
+    const rng = makeRng(seed);
+    this.seed = seed;
+    this.density = density;
+    this.#buildStars(rng, density);
+    this.#buildDust(rng, density);
+    this.#buildNebulae(rng, density);
+    this.resize();
+  }
+
+  #buildStars(rng, density) {
+    const armTotal = Math.round(COUNTS.armStars * density);
+    const fieldTotal = Math.round(COUNTS.fieldStars * density);
+    const stars = [];
+
+    for (let i = 0; i < armTotal; i++) {
+      const inBulge = rng.chance(GALAXY.coreBulge);
+      // t avanza a lo largo del brazo; la raíz concentra estrellas al centro.
+      const t = inBulge ? Math.pow(rng.raw(), 2) * 0.28 : Math.sqrt(rng.raw());
+      const arm = rng.int(0, GALAXY.arms - 1);
+      const base = (arm / GALAXY.arms) * TAU + t * GALAXY.spin * TAU;
+
+      // La dispersión crece con el radio: brazos nítidos al centro, difusos afuera.
+      const spread = GALAXY.scatter * (0.4 + t * 2.2);
+      const angle = base + rng.bell(-spread, spread) * TAU * 0.5;
+      const radius = clamp(t + rng.bell(-0.03, 0.03), 0.02, 1.05);
+
+      stars.push(makeStar(rng, angle, radius, inBulge ? 1.25 : 1));
+    }
+
+    // Estrellas de fondo repartidas por toda la pantalla, sin estructura espiral.
+    for (let i = 0; i < fieldTotal; i++) {
+      const star = makeStar(rng, rng.range(0, TAU), rng.range(0.15, 1.9), 0.55);
+      star.field = true;
+      stars.push(star);
+    }
+
+    this.stars = stars;
+  }
+
+  #buildDust(rng, density) {
+    this.dust = Array.from({ length: Math.round(COUNTS.dust * density) }, () => ({
+      x: rng.raw(),
+      y: rng.raw(),
+      size: rng.range(0.6, 2.4),
+      speed: rng.range(0.004, 0.018),
+      drift: rng.range(-0.006, 0.006),
+      alpha: rng.range(0.15, 0.6),
+      depth: rng.range(0.2, 1),
+    }));
+  }
+
+  #buildNebulae(rng, density) {
+    this.nebulae = Array.from(
+      { length: Math.round(COUNTS.nebulae * density) },
+      () => ({
+        x: rng.range(0.08, 0.92),
+        y: rng.range(0.1, 0.9),
+        rx: rng.range(0.12, 0.38),
+        ry: rng.range(0.08, 0.24),
+        rotation: rng.range(0, TAU),
+        color: rng.pick(NEBULA_COLORS),
+        phase: rng.range(0, TAU),
+        speed: rng.range(0.05, 0.14),
+      }),
+    );
+  }
+
+  /** Ajusta el canvas al viewport y repinta la capa de nebulosas. */
+  resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+
+    this.dpr = dpr;
+    this.width = w;
+    this.height = h;
+    this.canvas.width = Math.round(w * dpr);
+    this.canvas.height = Math.round(h * dpr);
+    this.canvas.style.width = `${w}px`;
+    this.canvas.style.height = `${h}px`;
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    this.radius = Math.max(w, h) * 0.62;
+    this.background = this.#buildBackground();
+    this.#paintNebulaLayer();
+  }
+
+  #buildBackground() {
+    const { ctx, width: w, height: h } = this;
+    const g = ctx.createRadialGradient(
+      w * 0.5,
+      h * 0.5,
+      0,
+      w * 0.5,
+      h * 0.5,
+      Math.max(w, h) * 0.78,
+    );
+    g.addColorStop(0, '#221c3a');
+    g.addColorStop(0.42, '#120f24');
+    g.addColorStop(1, '#04040c');
+    return g;
+  }
+
+  /** Las nebulosas se pintan una vez, desenfocadas, a 1/3 de resolución. */
+  #paintNebulaLayer() {
+    const scale = 0.34;
+    const c = this.nebulaLayer;
+    c.width = Math.max(1, Math.round(this.width * scale));
+    c.height = Math.max(1, Math.round(this.height * scale));
+
+    const ctx = c.getContext('2d');
+    ctx.clearRect(0, 0, c.width, c.height);
+    ctx.filter = 'blur(14px)';
+
+    for (const n of this.nebulae) {
+      const cx = n.x * c.width;
+      const cy = n.y * c.height;
+      const rx = n.rx * c.width;
+      const ry = n.ry * c.height;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(n.rotation);
+      ctx.scale(1, ry / rx);
+
+      const g = ctx.createRadialGradient(0, 0, 0, 0, 0, rx);
+      g.addColorStop(0, n.color);
+      g.addColorStop(0.55, n.color.replace(/[\d.]+\)$/, '0.05)'));
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(0, 0, rx, 0, TAU);
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.filter = 'none';
+  }
+
+  setPointer(nx, ny) {
+    this.pointer.x = nx;
+    this.pointer.y = ny;
+  }
+
+  /** Lanza un cometa desde un borde aleatorio hacia el interior. */
+  spawnComet() {
+    const fromLeft = Math.random() < 0.65;
+    const angle = fromLeft
+      ? Math.random() * 0.5 + 0.12 // hacia abajo-derecha
+      : Math.PI - (Math.random() * 0.5 + 0.12);
+    const speed = 620 + Math.random() * 520;
+
+    this.comets.push({
+      x: fromLeft ? -60 : this.width + 60,
+      y: Math.random() * this.height * 0.55,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 0,
+      ttl: 2.4,
+      len: 90 + Math.random() * 120,
+    });
+  }
+
+  /** Avanza la simulación. dt en segundos. */
+  update(dt) {
+    const step = this.motion ? dt : 0;
+
+    if (step) {
+      for (const star of this.stars) {
+        // Rotación diferencial: el núcleo gira más rápido que el borde.
+        star.angle += (GALAXY.rotation * step) / (0.22 + star.radius);
+      }
+      for (const d of this.dust) {
+        d.x += d.speed * step * 0.35;
+        d.y += d.drift * step * 0.35 - d.speed * step * 0.12;
+        if (d.x > 1.05) d.x -= 1.1;
+        if (d.y < -0.05) d.y += 1.1;
+        if (d.y > 1.05) d.y -= 1.1;
+      }
+    }
+
+    for (const comet of this.comets) {
+      comet.life += dt;
+      comet.x += comet.vx * dt;
+      comet.y += comet.vy * dt;
+    }
+    this.comets = this.comets.filter((c) => c.life < c.ttl);
+
+    // Reloj propio: con el movimiento apagado el titileo también se detiene.
+    this.time = (this.time || 0) + step;
+  }
+
+  render() {
+    const { ctx, width: w, height: h } = this;
+    const time = this.time || 0;
+    const px = this.pointer.x * 26;
+    const py = this.pointer.y * 18;
+
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = this.background;
+    ctx.fillRect(0, 0, w, h);
+
+    // Nebulosas: respiran lentamente con un pulso global suave.
+    const pulse = 0.72 + Math.sin(time * 0.22) * 0.12;
+    ctx.globalCompositeOperation = 'screen';
+    ctx.globalAlpha = clamp(pulse * this.bloom, 0, 1);
+    ctx.drawImage(this.nebulaLayer, px * 0.4, py * 0.4, w, h);
+
+    ctx.globalCompositeOperation = 'lighter';
+
+    const cx = w * 0.5;
+    const cy = h * 0.5;
+    const R = this.radius;
+
+    for (const star of this.stars) {
+      const r = star.radius;
+      const x = cx + Math.cos(star.angle) * r * R + px * star.depth;
+      const y = cy + Math.sin(star.angle) * r * R * GALAXY.flatten + py * star.depth;
+      if (x < -40 || x > w + 40 || y < -40 || y > h + 40) continue;
+
+      const twinkle = 0.55 + Math.sin(time * star.speed + star.phase) * 0.45;
+      const size = star.size * (0.85 + twinkle * 0.5) * this.bloom;
+
+      ctx.globalAlpha = clamp(star.alpha * twinkle * this.bloom, 0, 1);
+      ctx.drawImage(this.sprites[star.tier], x - size, y - size, size * 2, size * 2);
+    }
+
+    // Polvo cósmico: puntos diminutos a la deriva.
+    for (const d of this.dust) {
+      ctx.globalAlpha = d.alpha * 0.7 * this.bloom;
+      ctx.drawImage(
+        this.sprites[0],
+        d.x * w - d.size + px * d.depth,
+        d.y * h - d.size + py * d.depth,
+        d.size * 2,
+        d.size * 2,
+      );
+    }
+
+    this.#renderComets();
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  #renderComets() {
+    const { ctx } = this;
+    for (const comet of this.comets) {
+      const fade = 1 - comet.life / comet.ttl;
+      const nx = comet.vx / Math.hypot(comet.vx, comet.vy);
+      const ny = comet.vy / Math.hypot(comet.vx, comet.vy);
+      const tailX = comet.x - nx * comet.len;
+      const tailY = comet.y - ny * comet.len;
+
+      const g = ctx.createLinearGradient(tailX, tailY, comet.x, comet.y);
+      g.addColorStop(0, 'rgba(255, 180, 40, 0)');
+      g.addColorStop(1, `rgba(255, 236, 160, ${fade})`);
+
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = g;
+      ctx.lineWidth = 2.2;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(tailX, tailY);
+      ctx.lineTo(comet.x, comet.y);
+      ctx.stroke();
+
+      ctx.globalAlpha = fade;
+      ctx.drawImage(this.sprites[1], comet.x - 9, comet.y - 9, 18, 18);
+    }
+  }
+}
+
+function makeStar(rng, angle, radius, sizeBoost) {
+  const roll = rng.raw();
+  const tier = roll < STAR_TIERS[0].weight ? 0 : roll < 0.75 ? 1 : 2;
+
+  return {
+    angle,
+    radius,
+    tier,
+    size: rng.bell(0.7, 3.4) * sizeBoost,
+    alpha: rng.range(0.45, 1),
+    phase: rng.range(0, TAU),
+    speed: rng.range(0.5, 2.4),
+    depth: rng.range(0.1, 1),
+  };
+}
+
+/** Sprite reutilizable: núcleo blanco-oro que cae a transparente. */
+function buildStarSprite(tier) {
+  const c = document.createElement('canvas');
+  c.width = c.height = SPRITE_SIZE;
+  const ctx = c.getContext('2d');
+  const half = SPRITE_SIZE / 2;
+
+  const g = ctx.createRadialGradient(half, half, 0, half, half, half);
+  g.addColorStop(0, tier.core);
+  g.addColorStop(0.18, tier.mid);
+  g.addColorStop(0.42, hexToRgba(tier.edge, 0.45));
+  g.addColorStop(1, hexToRgba(tier.edge, 0));
+
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, SPRITE_SIZE, SPRITE_SIZE);
+  return c;
+}
+
+function hexToRgba(hex, alpha) {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
+}
+
+/* ===== garden.js ===== */
+/**
+ * Distribución de las flores sobre el cielo.
+ *
+ * Las flores se reparten en tres capas de profundidad. Cada capa se mueve a
+ * distinta velocidad con el puntero, así que el jardín tiene volumen en vez de
+ * ser una calcomanía plana sobre la galaxia.
+ */
+
+
+
+
+/** Zonas seguras: evitan el centro, donde el núcleo galáctico debe respirar. */
+const ZONES = [
+  [4, 26, 8, 34],
+  [72, 94, 8, 34],
+  [4, 24, 62, 90],
+  [74, 95, 60, 90],
+  [34, 66, 4, 18],
+  [32, 68, 80, 94],
+];
+
+const BOUQUET_SPOTS = [
+  { x: 13, y: 22, count: 6, spread: 62 },
+  { x: 82, y: 26, count: 5, spread: 54 },
+  { x: 19, y: 76, count: 6, spread: 64 },
+  { x: 86, y: 72, count: 5, spread: 52 },
+  { x: 50, y: 52, count: 3, spread: 40 },
+];
+
+class Garden {
+  constructor(root) {
+    this.root = root;
+    this.layers = [0.3, 0.62, 1].map((depth) => {
+      const layer = document.createElement('div');
+      layer.className = 'layer';
+      layer.dataset.depth = depth;
+      root.appendChild(layer);
+      return layer;
+    });
+  }
+
+  /** Reconstruye el jardín completo. */
+  build(seed, density = 1) {
+    const rng = makeRng(seed ^ 0x9e3779b9);
+    this.layers.forEach((l) => l.replaceChildren());
+
+    const compact = window.innerWidth < 720;
+    const scale = compact ? 0.62 : 1;
+    const bouquets = Math.max(2, Math.round(COUNTS.bouquets * (compact ? 0.6 : density)));
+    const scattered = Math.max(3, Math.round(COUNTS.scattered * density * (compact ? 0.5 : 1)));
+
+    BOUQUET_SPOTS.slice(0, bouquets).forEach((spot) => {
+      this.#addBouquet(spot, rng, scale);
+    });
+
+    for (let i = 0; i < scattered; i++) {
+      const zone = ZONES[i % ZONES.length];
+      const flower = createFlower(rng.pick(SPECIES), {
+        seed: rng.int(1, 1e9),
+        size: rng.range(34, 60) * scale,
+        hueShift: rng.range(-12, 10),
+      });
+      flower.style.left = `${rng.range(zone[0], zone[1])}%`;
+      flower.style.top = `${rng.range(zone[2], zone[3])}%`;
+      this.#place(flower, rng);
+    }
+  }
+
+  #addBouquet(spot, rng, scale) {
+    const bouquet = document.createElement('div');
+    bouquet.className = 'bouquet';
+    bouquet.style.left = `${spot.x}%`;
+    bouquet.style.top = `${spot.y}%`;
+    bouquet.style.setProperty('--sway-duration', `${rng.range(9, 15).toFixed(1)}s`);
+    bouquet.style.setProperty('--sway-delay', `${rng.range(-8, 0).toFixed(1)}s`);
+
+    for (let i = 0; i < spot.count; i++) {
+      const angle = (i / spot.count) * TAU + rng.range(-0.3, 0.3);
+      const distance = spot.spread * rng.range(0.35, 1) * scale;
+      const flower = createFlower(rng.pick(SPECIES), {
+        seed: rng.int(1, 1e9),
+        size: rng.range(40, 68) * scale,
+        hueShift: rng.range(-14, 12),
+      });
+      flower.style.left = `${Math.cos(angle) * distance}px`;
+      flower.style.top = `${Math.sin(angle) * distance}px`;
+      bouquet.appendChild(flower);
+    }
+
+    this.#place(bouquet, rng);
+  }
+
+  /** Coloca el elemento en una capa; las flores grandes van al frente. */
+  #place(node, rng) {
+    const index = rng.chance(0.4) ? 2 : rng.chance(0.5) ? 1 : 0;
+    const depth = Number(this.layers[index].dataset.depth);
+    node.style.setProperty('--depth', depth);
+    this.layers[index].appendChild(node);
+  }
+}
+
+/* ===== effects.js ===== */
+/**
+ * Capa de interacción: parallax, luz que sigue al puntero y estallido de
+ * pétalos al activar una flor.
+ *
+ * Detalles que el original no tenía:
+ *  - El seguimiento del puntero se suaviza con interpolación y se aplica con
+ *    `transform` (compositor) en vez de `left/top` (layout en cada fotograma).
+ *  - Sin puntero (móvil o inactividad) la escena deriva sola.
+ *  - Las flores responden a teclado: Tab para enfocar, Enter o Espacio para abrir.
+ */
+
+
+const PETAL_COLORS = ['#ffe259', '#ffc32b', '#ff9a1f', '#fff3b0'];
+
+class Effects {
+  constructor({ root, glow, layers, onBloom }) {
+    this.root = root;
+    this.glow = glow;
+    this.layers = layers;
+    this.onBloom = onBloom || (() => {});
+
+    this.target = { x: 0, y: 0 };
+    this.current = { x: 0, y: 0 };
+    this.pointerActive = false;
+    this.motion = true;
+
+    this.#bindPointer();
+    this.#bindActivation();
+  }
+
+  #bindPointer() {
+    window.addEventListener(
+      'pointermove',
+      (event) => {
+        this.pointerActive = true;
+        this.target.x = (event.clientX / window.innerWidth) * 2 - 1;
+        this.target.y = (event.clientY / window.innerHeight) * 2 - 1;
+        this.glow.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0) translate(-50%, -50%)`;
+        this.glow.style.opacity = event.pointerType === 'touch' ? '0' : '1';
+      },
+      { passive: true },
+    );
+
+    window.addEventListener('pointerleave', () => {
+      this.pointerActive = false;
+      this.glow.style.opacity = '0';
+    });
+  }
+
+  #bindActivation() {
+    this.root.addEventListener('pointerdown', (event) => {
+      const flower = event.target.closest('.flower');
+      if (flower) this.bloom(flower);
+    });
+
+    this.root.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      const flower = event.target.closest('.flower');
+      if (!flower) return;
+      event.preventDefault();
+      this.bloom(flower);
+    });
+  }
+
+  /** Abre una flor: pulso de escala, pétalos que salen disparados y sonido. */
+  bloom(flower) {
+    flower.classList.remove('is-blooming');
+    void flower.offsetWidth; // fuerza reinicio de la animación
+    flower.classList.add('is-blooming');
+
+    const rect = flower.getBoundingClientRect();
+    this.#burst(rect.left + rect.width / 2, rect.top + rect.height / 2, rect.width);
+    this.onBloom(flower.dataset.species || 'daisy');
+  }
+
+  #burst(x, y, size) {
+    const count = clamp(Math.round(size / 5), 8, 18);
+    const fragment = document.createDocumentFragment();
+
+    for (let i = 0; i < count; i++) {
+      const petal = document.createElement('span');
+      petal.className = 'petal-spark';
+      petal.style.background = PETAL_COLORS[i % PETAL_COLORS.length];
+      petal.style.left = `${x}px`;
+      petal.style.top = `${y}px`;
+      fragment.appendChild(petal);
+
+      const angle = (i / count) * TAU + Math.random() * 0.4;
+      const distance = size * (0.7 + Math.random() * 1.1);
+      const dx = Math.cos(angle) * distance;
+      const dy = Math.sin(angle) * distance + size * 0.5; // leve caída
+
+      petal.animate(
+        [
+          { transform: 'translate(-50%, -50%) scale(1) rotate(0deg)', opacity: 1 },
+          {
+            transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.2) rotate(${
+              Math.random() * 540 - 270
+            }deg)`,
+            opacity: 0,
+          },
+        ],
+        { duration: 700 + Math.random() * 500, easing: 'cubic-bezier(.16,.84,.44,1)' },
+      ).onfinish = () => petal.remove();
+    }
+
+    document.body.appendChild(fragment);
+  }
+
+  /** Suaviza el puntero y aplica el desplazamiento a cada capa. */
+  update(dt, time) {
+    if (!this.pointerActive && this.motion) {
+      // Deriva lenta en reposo, para que la escena nunca quede congelada.
+      this.target.x = Math.sin(time * 0.12) * 0.35;
+      this.target.y = Math.cos(time * 0.09) * 0.25;
+    }
+
+    const ease = this.motion ? 1 - Math.pow(0.001, dt) : 1;
+    this.current.x = lerp(this.current.x, this.target.x, ease);
+    this.current.y = lerp(this.current.y, this.target.y, ease);
+
+    for (const layer of this.layers) {
+      const depth = Number(layer.dataset.depth);
+      const x = -this.current.x * 40 * depth;
+      const y = -this.current.y * 26 * depth;
+      layer.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0)`;
+    }
+  }
+}
+
+/* ===== audio.js ===== */
+/**
+ * Campanas generativas con WebAudio (sin librerías ni archivos de audio).
+ *
+ * Cada especie de flor tiene su propio timbre: dos osciladores desafinados,
+ * envolvente corta y un eco que simula la distancia del espacio.
+ * El contexto solo se crea tras un gesto del usuario, como exigen los navegadores.
+ */
+
+
+const VOICES = {
+  daisy: { type: 'sine', detune: 4, decay: 1.6 },
+  sunflower: { type: 'triangle', detune: 7, decay: 2.2 },
+  tulip: { type: 'sine', detune: -6, decay: 1.2 },
+  rose: { type: 'triangle', detune: 10, decay: 2.6 },
+  lily: { type: 'sine', detune: -3, decay: 1.9 },
+};
+
+class Chimes {
+  constructor() {
+    this.enabled = false;
+    this.ctx = null;
+    this.step = 0;
+  }
+
+  setEnabled(value) {
+    this.enabled = value;
+    if (value) this.#ensureContext();
+    else if (this.ctx) this.ctx.suspend();
+  }
+
+  #ensureContext() {
+    if (!this.ctx) {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      this.ctx = new Ctx();
+
+      this.master = this.ctx.createGain();
+      this.master.gain.value = 0.22;
+      this.master.connect(this.ctx.destination);
+
+      // Eco corto: dos rebotes bastan para sugerir un espacio enorme.
+      this.delay = this.ctx.createDelay(1);
+      this.delay.delayTime.value = 0.28;
+      this.feedback = this.ctx.createGain();
+      this.feedback.gain.value = 0.34;
+      this.delay.connect(this.feedback).connect(this.delay);
+      this.delay.connect(this.master);
+    }
+    if (this.ctx.state === 'suspended') this.ctx.resume();
+  }
+
+  /** Toca una nota de la escala pentatónica según la especie tocada. */
+  play(species = 'daisy') {
+    if (!this.enabled) return;
+    this.#ensureContext();
+    if (!this.ctx) return;
+
+    const voice = VOICES[species] ?? VOICES.daisy;
+    const now = this.ctx.currentTime;
+    // Camina por la escala en vez de saltar al azar: suena melódico, no aleatorio.
+    this.step = (this.step + (Math.random() < 0.5 ? 1 : 2)) % SCALE_HZ.length;
+    const freq = SCALE_HZ[this.step];
+
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.9, now + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + voice.decay);
+    gain.connect(this.master);
+    gain.connect(this.delay);
+
+    for (const [index, ratio] of [1, 2.01].entries()) {
+      const osc = this.ctx.createOscillator();
+      osc.type = voice.type;
+      osc.frequency.value = freq * ratio;
+      osc.detune.value = voice.detune * (index ? -1 : 1);
+
+      const partial = this.ctx.createGain();
+      partial.gain.value = index ? 0.25 : 1;
+      osc.connect(partial).connect(gain);
+      osc.start(now);
+      osc.stop(now + voice.decay + 0.1);
+    }
+  }
+}
+
+/* ===== ui.js ===== */
+/**
+ * Panel de control.
+ *
+ * El markup vive en index.html (con clases de Tailwind); aquí solo se conectan
+ * los controles con la escena y se manejan los atajos de teclado.
+ */
+
+const SHORTCUTS = {
+  KeyN: 'reseed',
+  KeyC: 'comet',
+  KeyM: 'audio',
+  KeyH: 'panel',
+  Space: 'motion',
+};
+
+class Controls {
+  constructor(handlers) {
+    this.handlers = handlers;
+    this.panel = document.getElementById('panel');
+    this.toggle = document.getElementById('panel-toggle');
+    this.status = document.getElementById('status');
+
+    this.inputs = {
+      density: document.getElementById('control-density'),
+      bloom: document.getElementById('control-bloom'),
+      motion: document.getElementById('control-motion'),
+      audio: document.getElementById('control-audio'),
+    };
+
+    this.#bind();
+  }
+
+  #bind() {
+    this.inputs.density.addEventListener('input', (e) =>
+      this.handlers.onDensity(Number(e.target.value)),
+    );
+    this.inputs.bloom.addEventListener('input', (e) =>
+      this.handlers.onBloom(Number(e.target.value)),
+    );
+    this.inputs.motion.addEventListener('change', (e) =>
+      this.handlers.onMotion(e.target.checked),
+    );
+    this.inputs.audio.addEventListener('change', (e) =>
+      this.handlers.onAudio(e.target.checked),
+    );
+
+    document.getElementById('action-reseed').addEventListener('click', () =>
+      this.handlers.onReseed(),
+    );
+    document.getElementById('action-comet').addEventListener('click', () =>
+      this.handlers.onComet(),
+    );
+    document.getElementById('action-share').addEventListener('click', () =>
+      this.handlers.onShare(),
+    );
+
+    this.toggle.addEventListener('click', () => this.togglePanel());
+
+    document.addEventListener('keydown', (event) => {
+      const tag = event.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      const action = SHORTCUTS[event.code];
+      if (!action) return;
+      event.preventDefault();
+
+      if (action === 'panel') this.togglePanel();
+      if (action === 'reseed') this.handlers.onReseed();
+      if (action === 'comet') this.handlers.onComet();
+      if (action === 'motion') this.setMotion(!this.inputs.motion.checked, true);
+      if (action === 'audio') this.setAudio(!this.inputs.audio.checked, true);
+    });
+  }
+
+  togglePanel() {
+    const hidden = this.panel.classList.toggle('is-hidden');
+    this.toggle.setAttribute('aria-expanded', String(!hidden));
+  }
+
+  /** Refleja un valor en la interfaz (sin disparar el evento de cambio). */
+  sync({ density, bloom, motion, audio, seed }) {
+    if (density != null) this.inputs.density.value = density;
+    if (bloom != null) this.inputs.bloom.value = bloom;
+    if (motion != null) this.inputs.motion.checked = motion;
+    if (audio != null) this.inputs.audio.checked = audio;
+    if (seed != null) document.getElementById('seed-label').textContent = seed;
+  }
+
+  setMotion(value, notify) {
+    this.inputs.motion.checked = value;
+    if (notify) this.handlers.onMotion(value);
+  }
+
+  setAudio(value, notify) {
+    this.inputs.audio.checked = value;
+    if (notify) this.handlers.onAudio(value);
+  }
+
+  /** Mensaje efímero en la esquina (compartir, semilla nueva, etc.). */
+  say(message) {
+    this.status.textContent = message;
+    this.status.classList.remove('opacity-0');
+    clearTimeout(this.statusTimer);
+    this.statusTimer = setTimeout(() => this.status.classList.add('opacity-0'), 2400);
+  }
+
+  setStars(count) {
+    document.getElementById('star-count').textContent = count.toLocaleString('es-GT');
+  }
+}
+
+/* ===== main.js ===== */
+/**
+ * Punto de entrada: arma la escena y corre un único bucle de animación.
+ *
+ * Un solo requestAnimationFrame coordina galaxia, parallax y cometas, con dt
+ * real: la escena avanza igual en una pantalla de 60 Hz que en una de 120 Hz.
+ */
+
+
+
+
+
+
+
+
+
+const scene = document.getElementById('scene');
+const canvas = document.getElementById('sky');
+const glow = document.getElementById('glow');
+
+const saved = readUrlState();
+const state = {
+  ...DEFAULTS,
+  seedLabel: saved.seed || randomSeedLabel(),
+  density: clamp(saved.density ?? DEFAULTS.density, 0.4, 1.6),
+  motion: !prefersReducedMotion(),
+};
+
+installFlowerDefs();
+
+const starfield = new Starfield(canvas);
+const garden = new Garden(scene);
+const chimes = new Chimes();
+const effects = new Effects({
+  root: scene,
+  glow,
+  layers: garden.layers,
+  onBloom: (species) => chimes.play(species),
+});
+
+const controls = new Controls({
+  onDensity: (value) => {
+    state.density = value;
+    rebuild();
+  },
+  onBloom: (value) => {
+    state.bloom = value;
+    starfield.bloom = value;
+    document.documentElement.style.setProperty('--bloom', value);
+  },
+  onMotion: (value) => {
+    state.motion = value;
+    applyMotion();
+  },
+  onAudio: (value) => {
+    state.audio = value;
+    chimes.setEnabled(value);
+    controls.say(value ? 'Sonido activado' : 'Sonido en silencio');
+  },
+  onReseed: () => {
+    state.seedLabel = randomSeedLabel();
+    rebuild();
+    controls.say(`Nueva galaxia: ${state.seedLabel}`);
+  },
+  onComet: () => starfield.spawnComet(),
+  onShare: async () => {
+    try {
+      await navigator.clipboard.writeText(location.href);
+      controls.say('Enlace copiado con esta semilla');
+    } catch {
+      controls.say(`Semilla ${state.seedLabel} — copia la URL de la barra`);
+    }
+  },
+});
+
+function rebuild() {
+  const seed = seedFromString(state.seedLabel);
+  starfield.generate(seed, state.density);
+  garden.build(seed, state.density);
+  starfield.bloom = state.bloom;
+  applyMotion();
+  writeUrlState({ seed: state.seedLabel, density: state.density });
+  controls.sync({ ...state, seed: state.seedLabel });
+  controls.setStars(starfield.stars.length);
+}
+
+function applyMotion() {
+  starfield.motion = state.motion;
+  effects.motion = state.motion;
+  document.documentElement.classList.toggle('no-motion', !state.motion);
+}
+
+/* ---------- ciclo principal ---------- */
+
+let last = performance.now();
+let elapsed = 0;
+let nextComet = 4;
+let fpsAvg = 60;
+let degraded = false;
+let running = true;
+
+function frame(now) {
+  requestAnimationFrame(frame);
+  if (!running) {
+    last = now;
+    return;
+  }
+
+  // Un dt máximo de 50 ms evita saltos al volver de una pestaña en segundo plano.
+  const dt = Math.min((now - last) / 1000, 0.05);
+  last = now;
+  elapsed += dt;
+
+  if (dt > 0) fpsAvg = fpsAvg * 0.94 + (1 / dt) * 0.06;
+
+  if (state.motion) {
+    nextComet -= dt;
+    if (nextComet <= 0) {
+      starfield.spawnComet();
+      nextComet = 5 + Math.random() * 9;
+    }
+  }
+
+  effects.update(dt, elapsed);
+  starfield.setPointer(effects.current.x, effects.current.y);
+  starfield.update(dt);
+  starfield.render();
+
+  guardPerformance();
+}
+
+/** Si el equipo no da abasto, baja la densidad una sola vez. */
+function guardPerformance() {
+  if (degraded || elapsed < 4 || fpsAvg > 42 || state.density <= 0.5) return;
+  degraded = true;
+  state.density = Math.max(0.5, state.density - 0.35);
+  rebuild();
+  controls.say('Densidad ajustada para mantener la fluidez');
+}
+
+/* ---------- eventos del documento ---------- */
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+  starfield.resize();
+  clearTimeout(resizeTimer);
+  // El jardín solo se recompone cuando el cambio de tamaño se estabiliza.
+  resizeTimer = setTimeout(() => garden.build(seedFromString(state.seedLabel), state.density), 260);
+});
+
+document.addEventListener('visibilitychange', () => {
+  running = !document.hidden;
+});
+
+window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', (e) => {
+  controls.setMotion(!e.matches, true);
+});
+
+rebuild();
+document.body.classList.add('is-ready');
+requestAnimationFrame(frame);
+
+</script>
+</body>
+</html>

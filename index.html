@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="Una galaxia dorada generativa donde florecen ramos de luz. Toca una flor para abrirla." />
+  <meta name="theme-color" content="#04040c" />
+  <title>Vía Láctea Amarilla</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,600&family=Karla:wght@400;600&display=swap"
+    rel="stylesheet"
+  />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            gold: '#ffd23f',
+            amber: '#ffb02e',
+            ember: '#ff6f1f',
+            void: '#04040c',
+          },
+          fontFamily: {
+            display: ['Fraunces', 'Georgia', 'serif'],
+            sans: ['Karla', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <link rel="stylesheet" href="./main.css" />
+</head>
+
+<body class="font-sans">
+  <!-- Cielo: estrellas, nebulosas, polvo y cometas -->
+  <canvas id="sky" aria-hidden="true"></canvas>
+
+  <!-- Jardín: capas de flores con parallax -->
+  <main id="scene" aria-label="Jardín de flores doradas flotando en la galaxia"></main>
+
+  <div id="glow" aria-hidden="true"></div>
+
+  <!-- Mensaje efímero -->
+  <p
+    id="status"
+    role="status"
+    class="pointer-events-none fixed bottom-6 left-1/2 z-40 -translate-x-1/2 rounded-full border border-amber/30 bg-black/50 px-4 py-2 text-sm text-gold opacity-0 backdrop-blur transition-opacity duration-500"
+  ></p>
+
+  <!-- Panel de control -->
+  <button
+    id="panel-toggle"
+    type="button"
+    aria-expanded="true"
+    aria-controls="panel"
+    class="fixed right-4 top-4 z-50 rounded-full border border-amber/40 bg-black/45 px-4 py-2 text-sm text-gold backdrop-blur transition hover:border-gold hover:bg-black/70"
+  >
+    Panel
+  </button>
+
+  <aside
+    id="panel"
+    class="fixed right-4 top-16 z-40 w-[17.5rem] max-w-[calc(100vw-2rem)] rounded-2xl border border-amber/25 bg-black/45 p-5 backdrop-blur-md"
+  >
+    <h1 class="panel-title text-2xl font-light leading-tight text-gold">Vía Láctea Amarilla</h1>
+    <p class="mt-1 text-sm leading-snug text-amber/70">
+      Toca una flor para abrirla. Mueve el cursor para inclinar el cielo.
+    </p>
+
+    <div class="mt-5 space-y-4">
+      <label class="block">
+        <span class="mb-2 flex items-center justify-between text-sm text-gold/85">
+          Densidad de estrellas
+        </span>
+        <input
+          id="control-density"
+          type="range"
+          min="0.4"
+          max="1.6"
+          step="0.05"
+          value="1"
+          class="w-full"
+        />
+      </label>
+
+      <label class="block">
+        <span class="mb-2 flex items-center justify-between text-sm text-gold/85">
+          Intensidad del brillo
+        </span>
+        <input
+          id="control-bloom"
+          type="range"
+          min="0.4"
+          max="1.6"
+          step="0.05"
+          value="1"
+          class="w-full"
+        />
+      </label>
+
+      <div class="flex items-center justify-between gap-4 pt-1">
+        <label class="flex items-center gap-2 text-sm text-gold/85">
+          <input id="control-motion" type="checkbox" checked />
+          Movimiento
+        </label>
+        <label class="flex items-center gap-2 text-sm text-gold/85">
+          <input id="control-audio" type="checkbox" />
+          Sonido
+        </label>
+      </div>
+    </div>
+
+    <div class="mt-5 grid grid-cols-2 gap-2">
+      <button
+        id="action-reseed"
+        type="button"
+        class="col-span-2 rounded-xl border border-amber/40 bg-amber/10 px-3 py-2 text-sm text-gold transition hover:bg-amber/20"
+      >
+        Crear otra galaxia
+      </button>
+      <button
+        id="action-comet"
+        type="button"
+        class="rounded-xl border border-amber/25 px-3 py-2 text-sm text-gold/85 transition hover:border-gold hover:text-gold"
+      >
+        Lanzar cometa
+      </button>
+      <button
+        id="action-share"
+        type="button"
+        class="rounded-xl border border-amber/25 px-3 py-2 text-sm text-gold/85 transition hover:border-gold hover:text-gold"
+      >
+        Copiar enlace
+      </button>
+    </div>
+
+    <dl class="mt-5 space-y-1 border-t border-amber/15 pt-4 text-xs text-amber/60">
+      <div class="flex justify-between">
+        <dt>Semilla</dt>
+        <dd id="seed-label" class="text-gold/80">—</dd>
+      </div>
+      <div class="flex justify-between">
+        <dt>Estrellas en escena</dt>
+        <dd id="star-count" class="text-gold/80">0</dd>
+      </div>
+      <div class="flex justify-between">
+        <dt>Atajos</dt>
+        <dd class="text-gold/80">N, C, M, H, espacio</dd>
+      </div>
+    </dl>
+  </aside>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
