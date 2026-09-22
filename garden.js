@@ -12,20 +12,26 @@ import { makeRng, TAU } from './utils.js';
 
 /** Zonas seguras: evitan el centro, donde el núcleo galáctico debe respirar. */
 const ZONES = [
-  [4, 26, 8, 34],
-  [72, 94, 8, 34],
-  [4, 24, 62, 90],
-  [74, 95, 60, 90],
-  [34, 66, 4, 18],
-  [32, 68, 80, 94],
+  [2, 28, 6, 36],
+  [72, 96, 6, 36],
+  [2, 28, 64, 92],
+  [72, 96, 64, 92],
+  [8, 22, 4, 20],
+  [78, 92, 4, 20],
+  [8, 22, 80, 94],
+  [78, 92, 80, 94],
+  [36, 64, 2, 16],
+  [36, 64, 84, 96],
 ];
 
 const BOUQUET_SPOTS = [
-  { x: 13, y: 22, count: 6, spread: 62 },
-  { x: 82, y: 26, count: 5, spread: 54 },
-  { x: 19, y: 76, count: 6, spread: 64 },
-  { x: 86, y: 72, count: 5, spread: 52 },
-  { x: 50, y: 52, count: 3, spread: 40 },
+  { x: 10, y: 15, count: 5, spread: 58 },
+  { x: 90, y: 18, count: 4, spread: 52 },
+  { x: 15, y: 82, count: 5, spread: 60 },
+  { x: 88, y: 78, count: 4, spread: 50 },
+  { x: 50, y: 50, count: 3, spread: 38 },
+  { x: 20, y: 45, count: 4, spread: 48 },
+  { x: 80, y: 35, count: 4, spread: 46 },
 ];
 
 export class Garden {
@@ -50,7 +56,9 @@ export class Garden {
     const bouquets = Math.max(2, Math.round(COUNTS.bouquets * (compact ? 0.6 : density)));
     const scattered = Math.max(3, Math.round(COUNTS.scattered * density * (compact ? 0.5 : 1)));
 
-    BOUQUET_SPOTS.slice(0, bouquets).forEach((spot) => {
+    // Mezclar los bouquet spots para mejor distribución
+    const shuffledSpots = [...BOUQUET_SPOTS].sort(() => rng.chance(0.5) ? 1 : -1);
+    shuffledSpots.slice(0, bouquets).forEach((spot) => {
       this.#addBouquet(spot, rng, scale);
     });
 
@@ -58,8 +66,8 @@ export class Garden {
       const zone = ZONES[i % ZONES.length];
       const flower = createFlower(rng.pick(SPECIES), {
         seed: rng.int(1, 1e9),
-        size: rng.range(34, 60) * scale,
-        hueShift: rng.range(-12, 10),
+        size: rng.range(28, 65) * scale,
+        hueShift: rng.range(-15, 12),
       });
       flower.style.left = `${rng.range(zone[0], zone[1])}%`;
       flower.style.top = `${rng.range(zone[2], zone[3])}%`;
@@ -80,8 +88,8 @@ export class Garden {
       const distance = spot.spread * rng.range(0.35, 1) * scale;
       const flower = createFlower(rng.pick(SPECIES), {
         seed: rng.int(1, 1e9),
-        size: rng.range(40, 68) * scale,
-        hueShift: rng.range(-14, 12),
+        size: rng.range(35, 72) * scale,
+        hueShift: rng.range(-15, 14),
       });
       flower.style.left = `${Math.cos(angle) * distance}px`;
       flower.style.top = `${Math.sin(angle) * distance}px`;
@@ -93,7 +101,8 @@ export class Garden {
 
   /** Coloca el elemento en una capa; las flores grandes van al frente. */
   #place(node, rng) {
-    const index = rng.chance(0.4) ? 2 : rng.chance(0.5) ? 1 : 0;
+    // Mejor distribución: más flores en capas delanteras para mejor visibilidad
+    const index = rng.chance(0.5) ? 2 : rng.chance(0.35) ? 1 : 0;
     const depth = Number(this.layers[index].dataset.depth);
     node.style.setProperty('--depth', depth);
     this.layers[index].appendChild(node);

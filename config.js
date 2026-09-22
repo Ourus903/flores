@@ -23,8 +23,8 @@ export const COUNTS = {
   fieldStars: 700,
   dust: 180,
   nebulae: 9,
-  bouquets: 5,
-  scattered: 11,
+  bouquets: 7,
+  scattered: 18,
 };
 
 export const GALAXY = {
