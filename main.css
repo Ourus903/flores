@@ -296,4 +296,63 @@ input[type='checkbox'] {
   #glow {
     display: none;
   }
+
+  /* Panel más compacto en móviles */
+  #panel {
+    right: 0.5rem;
+    top: 3.5rem;
+    width: calc(100vw - 1rem);
+    max-width: 18rem;
+    padding: 1rem;
+  }
+
+  /* Botón del panel más grande para touch */
+  #panel-toggle {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  /* Flores más pequeñas en móviles */
+  .flower {
+    --size: 44px;
+  }
+
+  /* Mejorar touch targeting */
+  .flower,
+  button,
+  input[type='checkbox'] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Checkbox específico para mantener tamaño correcto */
+  input[type='checkbox'] {
+    min-height: auto;
+    min-width: auto;
+  }
+
+  /* Texto más pequeño en panel */
+  .panel-title {
+    font-size: 1.25rem;
+  }
+
+  /* Ajustar posición del panel cuando está oculto */
+  #panel.is-hidden {
+    transform: translateX(calc(100% + 1rem));
+  }
+}
+
+@media (max-width: 480px) {
+  /* Ajustes adicionales para pantallas muy pequeñas */
+  #panel {
+    padding: 0.75rem;
+  }
+
+  .panel-title {
+    font-size: 1.125rem;
+  }
+
+  .flower {
+    --size: 36px;
+  }
 }
