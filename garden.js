@@ -10,28 +10,38 @@ import { COUNTS, SPECIES } from './config.js';
 import { createFlower } from './flowers.js';
 import { makeRng, TAU } from './utils.js';
 
-/** Zonas seguras: evitan el centro, donde el núcleo galáctico debe respirar. */
+/** Zonas que cubren toda la pantalla para distribución completa */
 const ZONES = [
-  [2, 28, 6, 36],
-  [72, 96, 6, 36],
-  [2, 28, 64, 92],
-  [72, 96, 64, 92],
-  [8, 22, 4, 20],
-  [78, 92, 4, 20],
-  [8, 22, 80, 94],
-  [78, 92, 80, 94],
-  [36, 64, 2, 16],
-  [36, 64, 84, 96],
+  [0, 25, 0, 30],
+  [75, 100, 0, 30],
+  [0, 25, 70, 100],
+  [75, 100, 70, 100],
+  [0, 20, 30, 70],
+  [80, 100, 30, 70],
+  [30, 70, 0, 25],
+  [30, 70, 75, 100],
+  [20, 40, 35, 65],
+  [60, 80, 35, 65],
+  [35, 65, 20, 40],
+  [35, 65, 60, 80],
+  [25, 45, 45, 55],
+  [55, 75, 45, 55],
+  [40, 60, 30, 50],
+  [40, 60, 50, 70],
 ];
 
 const BOUQUET_SPOTS = [
-  { x: 10, y: 15, count: 5, spread: 58 },
-  { x: 90, y: 18, count: 4, spread: 52 },
-  { x: 15, y: 82, count: 5, spread: 60 },
-  { x: 88, y: 78, count: 4, spread: 50 },
-  { x: 50, y: 50, count: 3, spread: 38 },
-  { x: 20, y: 45, count: 4, spread: 48 },
-  { x: 80, y: 35, count: 4, spread: 46 },
+  { x: 8, y: 12, count: 5, spread: 60 },
+  { x: 92, y: 15, count: 4, spread: 55 },
+  { x: 12, y: 88, count: 5, spread: 62 },
+  { x: 90, y: 85, count: 4, spread: 52 },
+  { x: 50, y: 50, count: 4, spread: 40 },
+  { x: 25, y: 35, count: 4, spread: 50 },
+  { x: 75, y: 35, count: 4, spread: 48 },
+  { x: 25, y: 65, count: 4, spread: 52 },
+  { x: 75, y: 65, count: 4, spread: 50 },
+  { x: 50, y: 20, count: 3, spread: 45 },
+  { x: 50, y: 80, count: 3, spread: 45 },
 ];
 
 export class Garden {
@@ -62,6 +72,7 @@ export class Garden {
       this.#addBouquet(spot, rng, scale);
     });
 
+    // Usar todas las zonas cíclicamente para cubrir toda la pantalla
     for (let i = 0; i < scattered; i++) {
       const zone = ZONES[i % ZONES.length];
       const flower = createFlower(rng.pick(SPECIES), {
