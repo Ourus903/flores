@@ -31,17 +31,21 @@ const ZONES = [
 ];
 
 const BOUQUET_SPOTS = [
-  { x: 8, y: 12, count: 5, spread: 60 },
-  { x: 92, y: 15, count: 4, spread: 55 },
-  { x: 12, y: 88, count: 5, spread: 62 },
-  { x: 90, y: 85, count: 4, spread: 52 },
-  { x: 50, y: 50, count: 4, spread: 40 },
-  { x: 25, y: 35, count: 4, spread: 50 },
-  { x: 75, y: 35, count: 4, spread: 48 },
-  { x: 25, y: 65, count: 4, spread: 52 },
-  { x: 75, y: 65, count: 4, spread: 50 },
-  { x: 50, y: 20, count: 3, spread: 45 },
-  { x: 50, y: 80, count: 3, spread: 45 },
+  { x: 8, y: 12, count: 4, spread: 75 },
+  { x: 92, y: 15, count: 4, spread: 70 },
+  { x: 12, y: 88, count: 4, spread: 78 },
+  { x: 90, y: 85, count: 4, spread: 68 },
+  { x: 50, y: 50, count: 3, spread: 55 },
+  { x: 25, y: 35, count: 4, spread: 65 },
+  { x: 75, y: 35, count: 4, spread: 62 },
+  { x: 25, y: 65, count: 4, spread: 68 },
+  { x: 75, y: 65, count: 4, spread: 65 },
+  { x: 50, y: 20, count: 3, spread: 58 },
+  { x: 50, y: 80, count: 3, spread: 58 },
+  { x: 15, y: 50, count: 4, spread: 70 },
+  { x: 85, y: 50, count: 4, spread: 68 },
+  { x: 50, y: 35, count: 3, spread: 52 },
+  { x: 50, y: 65, count: 3, spread: 52 },
 ];
 
 export class Garden {
@@ -77,7 +81,7 @@ export class Garden {
       const zone = ZONES[i % ZONES.length];
       const flower = createFlower(rng.pick(SPECIES), {
         seed: rng.int(1, 1e9),
-        size: rng.range(28, 65) * scale,
+        size: rng.range(25, 55) * scale,
         hueShift: rng.range(-15, 12),
       });
       flower.style.left = `${rng.range(zone[0], zone[1])}%`;
@@ -96,10 +100,10 @@ export class Garden {
 
     for (let i = 0; i < spot.count; i++) {
       const angle = (i / spot.count) * TAU + rng.range(-0.3, 0.3);
-      const distance = spot.spread * rng.range(0.35, 1) * scale;
+      const distance = spot.spread * rng.range(0.45, 1.15) * scale;
       const flower = createFlower(rng.pick(SPECIES), {
         seed: rng.int(1, 1e9),
-        size: rng.range(35, 72) * scale,
+        size: rng.range(32, 65) * scale,
         hueShift: rng.range(-15, 14),
       });
       flower.style.left = `${Math.cos(angle) * distance}px`;
